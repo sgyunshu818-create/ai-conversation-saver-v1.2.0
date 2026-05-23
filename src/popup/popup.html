@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Conversation Saver</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup">
+      <header class="header">
+        <div>
+          <h1>AI Saver</h1>
+          <p>Local browser storage only</p>
+        </div>
+      </header>
+
+      <button id="save-current" class="primary" type="button">Save current conversation</button>
+      <p id="status" class="status" role="status"></p>
+
+      <section class="saved">
+        <div class="section-title">
+          <h2>Saved</h2>
+          <span id="count">0</span>
+        </div>
+        <div id="conversation-list" class="conversation-list"></div>
+      </section>
+    </main>
+
+    <script src="../shared/conversation-utils.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

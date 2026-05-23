@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "AI Conversation Saver",
+  "description": "Save ChatGPT and Gemini conversations locally and export them as Markdown or JSON.",
+  "version": "0.1.0",
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "AI Conversation Saver"
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://gemini.google.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
+      "js": [
+        "src/shared/conversation-utils.js",
+        "src/content/common.js",
+        "src/content/chatgpt.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": [
+        "src/shared/conversation-utils.js",
+        "src/content/common.js",
+        "src/content/gemini.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
