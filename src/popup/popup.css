@@ -47,28 +47,9 @@ h1 {
   font-size: 12px;
 }
 
-.primary {
-  width: 100%;
-  min-height: 38px;
-  border: 0;
-  border-radius: 6px;
-  color: #ffffff;
-  background: #1769aa;
-  cursor: pointer;
-}
-
-.primary:hover {
-  background: #125889;
-}
-
-.primary:disabled {
-  cursor: wait;
-  opacity: 0.65;
-}
-
 .status {
-  min-height: 34px;
-  padding: 9px 0 4px;
+  min-height: 24px;
+  padding: 2px 0 10px;
   color: #435165;
   line-height: 1.35;
 }
@@ -85,7 +66,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 4px 0 8px;
+  margin: 8px 0 8px;
 }
 
 .section-title h2 {
@@ -100,7 +81,7 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 430px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
@@ -128,6 +109,23 @@ h1 {
   color: #637083;
   font-size: 12px;
   line-height: 1.4;
+}
+
+.live-card {
+  margin-bottom: 12px;
+  border-color: #b7c9dc;
+  background: #fbfdff;
+}
+
+.preview {
+  display: -webkit-box;
+  margin-top: 8px;
+  overflow: hidden;
+  color: #324154;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .actions {

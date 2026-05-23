@@ -51,4 +51,6 @@
       };
     },
   };
+
+  root.AIConversationSaverAutosave.startAutosave();
 })(globalThis);

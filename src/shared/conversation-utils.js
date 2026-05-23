@@ -17,6 +17,22 @@
     return safeFilename(`${site}-${url}-${savedAt}`).toLowerCase();
   }
 
+  function stableConversationId(site, url) {
+    return safeFilename(`autosave-${site || 'unknown'}-${url || 'unknown'}`).toLowerCase();
+  }
+
+  function conversationSignature(conversation) {
+    const normalized = normalizeConversation({
+      ...conversation,
+      savedAt: 'signature',
+      id: 'signature',
+    });
+    return JSON.stringify({
+      title: normalized.title,
+      messages: normalized.messages,
+    });
+  }
+
   function normalizeConversation(input) {
     const savedAt = input.savedAt || new Date().toISOString();
     const site = cleanText(input.site) || 'unknown';
@@ -71,8 +87,10 @@
 
   const api = {
     cleanText,
+    conversationSignature,
     normalizeConversation,
     safeFilename,
+    stableConversationId,
     toJson,
     toMarkdown,
   };

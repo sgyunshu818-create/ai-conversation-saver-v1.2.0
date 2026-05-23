@@ -3,8 +3,10 @@ import test from 'node:test';
 import utils from '../src/shared/conversation-utils.js';
 
 const {
+  conversationSignature,
   normalizeConversation,
   safeFilename,
+  stableConversationId,
   toJson,
   toMarkdown,
 } = utils;
@@ -70,4 +72,29 @@ test('toJson returns parseable formatted JSON preserving messages', () => {
 test('safeFilename removes invalid Windows filename characters', () => {
   assert.equal(safeFilename('GPT: a/b\\c*d?e"f<g>h|i'), 'GPT-a-b-c-d-e-f-g-h-i');
   assert.equal(safeFilename('   '), 'conversation');
+});
+
+test('stableConversationId ignores save time for repeated auto saves', () => {
+  const first = stableConversationId('chatgpt', 'https://chatgpt.com/c/abc');
+  const second = stableConversationId('chatgpt', 'https://chatgpt.com/c/abc');
+
+  assert.equal(first, second);
+  assert.equal(first, 'autosave-chatgpt-https-chatgpt-com-c-abc');
+});
+
+test('conversationSignature changes when message content changes', () => {
+  const base = conversationSignature({
+    title: 'Live',
+    messages: [{ role: 'user', text: 'Hello' }],
+  });
+  const updated = conversationSignature({
+    title: 'Live',
+    messages: [
+      { role: 'user', text: 'Hello' },
+      { role: 'assistant', text: 'Hi' },
+    ],
+  });
+
+  assert.notEqual(base, updated);
+  assert.equal(base, conversationSignature({ title: 'Live', messages: [{ role: 'user', text: 'Hello' }] }));
 });

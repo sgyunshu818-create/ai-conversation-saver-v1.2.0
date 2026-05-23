@@ -1,8 +1,10 @@
 const statusEl = document.querySelector('#status');
-const saveButton = document.querySelector('#save-current');
+const currentCardEl = document.querySelector('#current-card');
+const liveStateEl = document.querySelector('#live-state');
 const listEl = document.querySelector('#conversation-list');
 const countEl = document.querySelector('#count');
 const utils = globalThis.ConversationUtils;
+let refreshTimer = 0;
 
 function setStatus(message, type = '') {
   statusEl.textContent = message;
@@ -52,6 +54,13 @@ function formatDate(value) {
   }
 }
 
+function lastMessagePreview(conversation) {
+  const last = conversation.messages[conversation.messages.length - 1];
+  if (!last) return 'No visible messages detected yet.';
+  const role = last.role === 'user' ? 'User' : 'Assistant';
+  return `${role}: ${last.text}`;
+}
+
 function downloadFile(filename, content, type) {
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
@@ -68,6 +77,58 @@ async function loadConversations() {
     throw new Error(response?.error || 'Could not read saved conversations.');
   }
   renderConversations(response.conversations);
+}
+
+async function loadCurrentConversation() {
+  const tab = await queryActiveTab();
+  if (!tab || !tab.id) {
+    throw new Error('No active tab was found.');
+  }
+
+  const extracted = await sendTabMessage(tab.id, { type: 'GET_CURRENT_CONVERSATION' });
+  if (!extracted || !extracted.ok) {
+    throw new Error(extracted?.error || 'Open ChatGPT or Gemini to see live conversation info.');
+  }
+
+  renderCurrentConversation(extracted.conversation);
+}
+
+function renderCurrentConversation(conversation) {
+  liveStateEl.textContent = 'Live';
+  currentCardEl.textContent = '';
+
+  const title = document.createElement('div');
+  title.className = 'conversation-title';
+  title.textContent = conversation.title;
+
+  const meta = document.createElement('div');
+  meta.className = 'conversation-meta';
+  meta.textContent = `${conversation.site} · ${conversation.messages.length} messages · auto-saving`;
+
+  const preview = document.createElement('div');
+  preview.className = 'preview';
+  preview.textContent = lastMessagePreview(conversation);
+
+  currentCardEl.append(title, meta, preview);
+}
+
+function renderCurrentFallback(message) {
+  liveStateEl.textContent = 'Idle';
+  currentCardEl.textContent = '';
+
+  const title = document.createElement('div');
+  title.className = 'conversation-title';
+  title.textContent = 'No live conversation detected';
+
+  const meta = document.createElement('div');
+  meta.className = 'conversation-meta';
+  meta.textContent = message;
+
+  const preview = document.createElement('div');
+  preview.className = 'preview';
+  preview.textContent = 'Open or refresh a supported AI chat page, then this panel will update automatically.';
+
+  currentCardEl.append(title, meta, preview);
 }
 
 function renderConversations(conversations) {
@@ -127,43 +188,22 @@ function renderConversations(conversations) {
   }
 }
 
-async function saveCurrentConversation() {
-  saveButton.disabled = true;
-  setStatus('Reading current tab...');
+async function refreshPopup() {
+  try {
+    await loadCurrentConversation();
+    setStatus('Current conversation is saved automatically.', 'success');
+  } catch (error) {
+    renderCurrentFallback(error.message || String(error));
+    setStatus('Auto-save runs when a supported chat page is open.');
+  }
 
   try {
-    const tab = await queryActiveTab();
-    if (!tab || !tab.id) {
-      throw new Error('No active tab was found.');
-    }
-
-    const extracted = await sendTabMessage(tab.id, { type: 'GET_CURRENT_CONVERSATION' });
-    if (!extracted || !extracted.ok) {
-      throw new Error(extracted?.error || 'Could not extract this conversation.');
-    }
-
-    const saved = await sendRuntimeMessage({
-      type: 'SAVE_CONVERSATION',
-      payload: {
-        ...extracted.conversation,
-        savedAt: new Date().toISOString(),
-      },
-    });
-    if (!saved || !saved.ok) {
-      throw new Error(saved?.error || 'Could not save this conversation.');
-    }
-
-    setStatus(`Saved "${saved.conversation.title}".`, 'success');
     await loadConversations();
   } catch (error) {
     setStatus(error.message || String(error), 'error');
-  } finally {
-    saveButton.disabled = false;
   }
 }
 
-saveButton.addEventListener('click', saveCurrentConversation);
-
-loadConversations().catch((error) => {
-  setStatus(error.message || String(error), 'error');
-});
+refreshPopup();
+refreshTimer = setInterval(refreshPopup, 1500);
+window.addEventListener('unload', () => clearInterval(refreshTimer));

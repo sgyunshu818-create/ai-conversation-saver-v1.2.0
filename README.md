@@ -1,6 +1,6 @@
 # AI Conversation Saver
 
-A local-only Chrome extension for saving ChatGPT and Gemini conversations from the current browser page.
+A local-only Chrome extension for automatically saving ChatGPT and Gemini conversations from the current browser page.
 
 ## Supported Sites
 
@@ -19,13 +19,14 @@ A local-only Chrome extension for saving ChatGPT and Gemini conversations from t
 
 1. Open a ChatGPT or Gemini conversation.
 2. Click the AI Saver extension icon.
-3. Click Save current conversation.
-4. Use Markdown or JSON on any saved item to export it.
-5. Use Delete to remove a saved item from local browser storage.
+3. The popup shows live information for the current conversation.
+4. The extension automatically saves the latest visible conversation locally.
+5. Use Markdown or JSON on any saved item to export it when needed.
+6. Use Delete to remove a saved item from local browser storage.
 
 ## Privacy
 
-This extension stores conversations only in `chrome.storage.local` in your browser profile. It does not upload content to a server and does not require any account.
+This extension stores conversations only in `chrome.storage.local` in your browser profile. It does not upload content to a server and does not require any account. Export files are created only when you click Markdown or JSON.
 
 ## Maintenance Notes
 

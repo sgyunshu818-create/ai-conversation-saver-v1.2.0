@@ -11,12 +11,23 @@
       <header class="header">
         <div>
           <h1>AI Saver</h1>
-          <p>Local browser storage only</p>
+          <p>Auto-save locally, export when needed</p>
         </div>
       </header>
 
-      <button id="save-current" class="primary" type="button">Save current conversation</button>
       <p id="status" class="status" role="status"></p>
+
+      <section class="current">
+        <div class="section-title">
+          <h2>Current conversation</h2>
+          <span id="live-state">Checking</span>
+        </div>
+        <article id="current-card" class="conversation live-card">
+          <div class="conversation-title">Open ChatGPT or Gemini</div>
+          <div class="conversation-meta">Waiting for a supported conversation page.</div>
+          <div class="preview">The popup will show live message information here.</div>
+        </article>
+      </section>
 
       <section class="saved">
         <div class="section-title">

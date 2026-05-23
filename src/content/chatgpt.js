@@ -27,4 +27,6 @@
       };
     },
   };
+
+  root.AIConversationSaverAutosave.startAutosave();
 })(globalThis);

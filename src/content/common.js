@@ -1,4 +1,8 @@
 (function initCommonContent(root) {
+  let autosaveTimer = 0;
+  let lastSignature = '';
+  let observer = null;
+
   function isVisible(element) {
     const style = root.getComputedStyle(element);
     const box = element.getBoundingClientRect();
@@ -31,6 +35,60 @@
     uniqueMessages,
   };
 
+  function extractCurrentConversation() {
+    if (!root.AIConversationExtractor) {
+      return null;
+    }
+
+    const extracted = root.AIConversationExtractor.extract();
+    if (!extracted.messages.length) {
+      return null;
+    }
+
+    return {
+      ...extracted,
+      id: root.ConversationUtils.stableConversationId(extracted.site, extracted.url),
+      savedAt: new Date().toISOString(),
+    };
+  }
+
+  function autosaveNow() {
+    const conversation = extractCurrentConversation();
+    if (!conversation) return;
+
+    const signature = root.ConversationUtils.conversationSignature(conversation);
+    if (signature === lastSignature) return;
+
+    lastSignature = signature;
+    chrome.runtime.sendMessage({
+      type: 'SAVE_CONVERSATION',
+      payload: conversation,
+    });
+  }
+
+  function scheduleAutosave(delay = 1500) {
+    root.clearTimeout(autosaveTimer);
+    autosaveTimer = root.setTimeout(autosaveNow, delay);
+  }
+
+  function startAutosave() {
+    if (observer) return;
+
+    scheduleAutosave(400);
+    observer = new MutationObserver(() => scheduleAutosave());
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+
+  root.AIConversationSaverAutosave = {
+    extractCurrentConversation,
+    scheduleAutosave,
+    startAutosave,
+  };
+
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!message || message.type !== 'GET_CURRENT_CONVERSATION') {
       return false;
@@ -42,8 +100,8 @@
         return false;
       }
 
-      const conversation = root.AIConversationExtractor.extract();
-      if (!conversation.messages.length) {
+      const conversation = extractCurrentConversation();
+      if (!conversation) {
         sendResponse({ ok: false, error: 'No conversation messages were detected on this page.' });
         return false;
       }

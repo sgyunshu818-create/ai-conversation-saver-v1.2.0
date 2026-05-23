@@ -20,6 +20,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'SAVE_CONVERSATION') {
     getStore((records) => {
       const conversation = globalThis.ConversationUtils.normalizeConversation(message.payload || {});
+      const existing = records[conversation.id] || {};
+      if (existing.createdAt) {
+        conversation.createdAt = existing.createdAt;
+      } else {
+        conversation.createdAt = conversation.savedAt;
+      }
       records[conversation.id] = conversation;
       setStore(records, () => {
         sendResponse({ ok: true, conversation });
