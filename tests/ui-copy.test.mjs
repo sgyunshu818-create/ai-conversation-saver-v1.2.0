@@ -50,6 +50,15 @@ test('memory home has stats cards, search, and filter controls', () => {
   assert.match(popupCss, /\.filter-panel/);
 });
 
+test('filter panel opens as a dropdown above the chat list in side panel', () => {
+  assert.match(popupCss, /body\[data-view="sidepanel"\] \.memory-home-top\s*\{[^}]*position: relative/);
+  assert.match(popupCss, /body\[data-view="sidepanel"\] \.memory-home-top\s*\{[^}]*overflow: visible/);
+  assert.match(popupCss, /body\[data-view="sidepanel"\] \.memory-home-top\s*\{[^}]*z-index: 10/);
+  assert.match(popupCss, /\.filter-panel\s*\{[^}]*position: absolute/);
+  assert.match(popupCss, /\.filter-panel\s*\{[^}]*z-index: 20/);
+  assert.match(popupCss, /body\[data-view="sidepanel"\] \.memory-list\s*\{[^}]*z-index: 1/);
+});
+
 test('AI platform labels include source logo marks', () => {
   assert.match(popupJs, /function siteLogoIcon/);
   assert.match(popupJs, /renderSiteBadge/);

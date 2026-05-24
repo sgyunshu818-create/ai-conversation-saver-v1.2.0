@@ -215,7 +215,9 @@ body[data-view="sidepanel"] #memory-list-screen.active {
 body[data-view="sidepanel"] .memory-home-top {
   margin: 0 0 12px;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow: visible;
+  position: relative;
+  z-index: 10;
 }
 
 .memory-stats {
@@ -317,7 +319,7 @@ body[data-view="sidepanel"] .memory-home-top {
   position: absolute;
   top: 44px;
   right: 0;
-  z-index: 6;
+  z-index: 20;
   display: grid;
   gap: 10px;
   width: min(340px, 100%);
@@ -413,6 +415,8 @@ body[data-view="sidepanel"] .memory-list {
   flex: 1;
   max-height: none;
   min-height: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .memory-card {
