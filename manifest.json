@@ -1,20 +1,53 @@
 {
   "manifest_version": 3,
-  "name": "AI Conversation Saver",
-  "description": "Save ChatGPT and Gemini conversations locally and export them as Markdown or JSON.",
-  "version": "0.1.0",
+  "name": "ChatAi Memo",
+  "description": "本地保存 AI 对话，并可导出为 Markdown 文档。",
+  "version": "1.2.0",
   "action": {
-    "default_popup": "src/popup/popup.html",
-    "default_title": "AI Conversation Saver"
+    "default_title": "ChatAi Memo",
+    "default_icon": {
+      "16": "src/assets/icons/chatai-memo-16.png",
+      "32": "src/assets/icons/chatai-memo-32.png",
+      "48": "src/assets/icons/chatai-memo-48.png",
+      "128": "src/assets/icons/chatai-memo-128.png"
+    }
+  },
+  "icons": {
+    "16": "src/assets/icons/chatai-memo-16.png",
+    "32": "src/assets/icons/chatai-memo-32.png",
+    "48": "src/assets/icons/chatai-memo-48.png",
+    "128": "src/assets/icons/chatai-memo-128.png"
   },
   "background": {
     "service_worker": "src/background.js"
   },
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "scripting", "sidePanel", "storage"],
+  "side_panel": {
+    "default_path": "src/sidepanel/sidepanel.html"
+  },
   "host_permissions": [
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
-    "https://gemini.google.com/*"
+    "https://gemini.google.com/*",
+    "https://chat.deepseek.com/*",
+    "https://www.deepseek.com/*",
+    "https://www.kimi.com/*",
+    "https://kimi.com/*",
+    "https://claude.ai/*",
+    "https://claude.com/*",
+    "https://www.doubao.com/*",
+    "https://doubao.com/*",
+    "https://chat.qwen.ai/*",
+    "https://qwen.ai/*",
+    "https://www.qwen.ai/*",
+    "https://www.qianwen.com/*",
+    "https://qianwen.com/*",
+    "https://yiyan.baidu.com/*",
+    "https://chatglm.cn/*",
+    "https://www.chatglm.cn/*",
+    "https://chat.minimax.io/*",
+    "https://www.minimax.io/*",
+    "https://minimax.io/*"
   ],
   "content_scripts": [
     {
@@ -32,6 +65,35 @@
         "src/shared/conversation-utils.js",
         "src/content/common.js",
         "src/content/gemini.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://chat.deepseek.com/*",
+        "https://www.deepseek.com/*",
+        "https://www.kimi.com/*",
+        "https://kimi.com/*",
+        "https://claude.ai/*",
+        "https://claude.com/*",
+        "https://www.doubao.com/*",
+        "https://doubao.com/*",
+        "https://chat.qwen.ai/*",
+        "https://qwen.ai/*",
+        "https://www.qwen.ai/*",
+        "https://www.qianwen.com/*",
+        "https://qianwen.com/*",
+        "https://yiyan.baidu.com/*",
+        "https://chatglm.cn/*",
+        "https://www.chatglm.cn/*",
+        "https://chat.minimax.io/*",
+        "https://www.minimax.io/*",
+        "https://minimax.io/*"
+      ],
+      "js": [
+        "src/shared/conversation-utils.js",
+        "src/content/common.js",
+        "src/content/generic.js"
       ],
       "run_at": "document_idle"
     }
