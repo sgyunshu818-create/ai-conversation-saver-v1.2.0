@@ -28,3 +28,11 @@ test('extension declares custom icons for browser chrome', () => {
     assert.ok(fs.existsSync(iconPath), `${iconPath} should exist`);
   }
 });
+
+test('plugin logo is available to the AI-page floating button', () => {
+  assert.ok(Array.isArray(manifest.web_accessible_resources));
+  assert.deepEqual(manifest.web_accessible_resources[0].resources, ['src/assets/icons/chatai-memo-48.png']);
+  assert.ok(manifest.web_accessible_resources[0].matches.includes('https://chatgpt.com/*'));
+  assert.ok(manifest.web_accessible_resources[0].matches.includes('https://gemini.google.com/*'));
+  assert.ok(manifest.web_accessible_resources[0].matches.includes('https://claude.ai/*'));
+});

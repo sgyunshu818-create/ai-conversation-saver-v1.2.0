@@ -7,6 +7,7 @@ const sidepanelHtml = fs.readFileSync('src/sidepanel/sidepanel.html', 'utf8');
 const popupJs = fs.readFileSync('src/popup/popup.js', 'utf8');
 const popupCss = fs.readFileSync('src/popup/popup.css', 'utf8');
 const backgroundJs = fs.readFileSync('src/background.js', 'utf8');
+const commonContentJs = fs.readFileSync('src/content/common.js', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
 
 for (const [name, html] of [
@@ -296,6 +297,67 @@ test('extension panel uses a wider initial layout', () => {
 test('background supports title updates for detail editing', () => {
   assert.match(backgroundJs, /UPDATE_CONVERSATION_TITLE/);
   assert.match(backgroundJs, /message\.title/);
+});
+
+test('AI pages show a draggable auto memory floating button that opens the side panel', () => {
+  assert.match(commonContentJs, /initFloatingMemoryButton/);
+  assert.match(commonContentJs, /attachShadow\(\{ mode: 'open' \}\)/);
+  assert.match(commonContentJs, /\\u81ea\\u52a8\\u8bb0\\u5fc6/);
+  assert.match(commonContentJs, /chatai-memo-48\.png/);
+  assert.match(commonContentJs, /floating-button-position/);
+  assert.match(commonContentJs, /pointerdown/);
+  assert.match(commonContentJs, /pointermove/);
+  assert.match(commonContentJs, /pointerup/);
+  assert.match(commonContentJs, /OPEN_SIDE_PANEL/);
+  assert.match(commonContentJs, /box-shadow: 0 6px 14px/);
+  assert.match(commonContentJs, /box-shadow: 0 10px 22px/);
+  assert.match(backgroundJs, /OPEN_SIDE_PANEL/);
+  assert.match(backgroundJs, /chrome\.sidePanel\.open\(\{ tabId: sender\.tab\.id \}/);
+});
+
+test('floating auto memory button hides while the side panel is open', () => {
+  assert.match(popupJs, /function notifySidePanelVisibility/);
+  assert.match(popupJs, /document\.body\.dataset\.view === 'sidepanel'/);
+  assert.match(popupJs, /SIDE_PANEL_VISIBILITY/);
+  assert.match(popupJs, /notifySidePanelVisibility\(true\)/);
+  assert.match(popupJs, /notifySidePanelVisibility\(false\)/);
+  assert.match(popupJs, /window\.addEventListener\('unload', \(\) => notifySidePanelVisibility\(false\)\)/);
+  assert.match(backgroundJs, /SIDE_PANEL_VISIBILITY/);
+  assert.match(backgroundJs, /chrome\.tabs\.query\(\{ active: true, currentWindow: true \}/);
+  assert.match(backgroundJs, /SET_FLOATING_BUTTON_VISIBILITY/);
+  assert.match(commonContentJs, /SET_FLOATING_BUTTON_VISIBILITY/);
+  assert.match(commonContentJs, /setFloatingButtonVisibility/);
+  assert.match(commonContentJs, /host\.style\.display = visible \? '' : 'none'/);
+});
+
+test('floating button stops extension API calls after content context is invalidated', () => {
+  assert.match(commonContentJs, /function isExtensionContextActive/);
+  assert.match(commonContentJs, /chrome\.runtime\.id/);
+  assert.match(commonContentJs, /function disableFloatingButton/);
+  assert.match(commonContentJs, /floatingButtonHost\.remove\(\)/);
+  assert.match(commonContentJs, /try[\s\S]*chrome\.storage\.local\.set/);
+  assert.match(commonContentJs, /catch \(error\)[\s\S]*disableFloatingButton\(\)/);
+  assert.match(commonContentJs, /if \(!isExtensionContextActive\(\)\) return/);
+  assert.match(commonContentJs, /chrome\.runtime\.getURL\('src\/assets\/icons\/chatai-memo-48\.png'\)/);
+  assert.match(commonContentJs, /src="\$\{logoUrl\}"/);
+});
+
+test('new content script replaces stale floating buttons left by an old extension context', () => {
+  assert.match(commonContentJs, /function removeExistingFloatingButton/);
+  assert.match(commonContentJs, /document\.getElementById\(FLOATING_BUTTON_ID\)/);
+  assert.match(commonContentJs, /existingHost\.remove\(\)/);
+  assert.match(commonContentJs, /removeExistingFloatingButton\(\)[\s\S]*const host = document\.createElement\('div'\)/);
+  assert.doesNotMatch(commonContentJs, /if \(document\.getElementById\(FLOATING_BUTTON_ID\)\) return/);
+});
+
+test('content script suppresses stale extension context errors after reload', () => {
+  assert.match(commonContentJs, /function isExtensionContextInvalidatedError/);
+  assert.match(commonContentJs, /Extension context invalidated/);
+  assert.match(commonContentJs, /function safelyDisableFloatingButton/);
+  assert.match(commonContentJs, /root\.addEventListener\('error'/);
+  assert.match(commonContentJs, /root\.addEventListener\('unhandledrejection'/);
+  assert.match(commonContentJs, /event\.preventDefault\(\)[\s\S]*event\.stopImmediatePropagation\(\)[\s\S]*safelyDisableFloatingButton\(\)/);
+  assert.doesNotMatch(commonContentJs, /root\.addEventListener\('error'[\s\S]*disableFloatingButton\(\)[\s\S]*event\.preventDefault\(\)/);
 });
 
 test('extension visible name uses ChatAi Memo', () => {

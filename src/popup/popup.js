@@ -34,6 +34,7 @@ const selectionCountEl = document.querySelector('#selection-count');
 const selectionConfirmButton = document.querySelector('#selection-confirm');
 const railButtons = Array.from(document.querySelectorAll('[data-target-view]'));
 const utils = globalThis.ConversationUtils;
+const IS_SIDE_PANEL = document.body.dataset.view === 'sidepanel';
 
 let refreshTimer = 0;
 let selectedConversationId = '';
@@ -71,6 +72,14 @@ function sendRuntimeMessage(message) {
       }
       resolve(response);
     });
+  });
+}
+
+function notifySidePanelVisibility(visible) {
+  if (!IS_SIDE_PANEL) return;
+
+  chrome.runtime.sendMessage({ type: 'SIDE_PANEL_VISIBILITY', visible }, () => {
+    chrome.runtime.lastError;
   });
 }
 
@@ -1287,6 +1296,8 @@ selectionConfirmButton.addEventListener('click', confirmSelectionAction);
 
 loadAutoSaveSetting();
 refreshBackupStatus();
+notifySidePanelVisibility(true);
 refreshPopup();
 refreshTimer = setInterval(refreshPopup, 3000);
+window.addEventListener('unload', () => notifySidePanelVisibility(false));
 window.addEventListener('unload', () => clearInterval(refreshTimer));

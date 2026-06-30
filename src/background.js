@@ -22,6 +22,24 @@ function setStore(records, callback) {
   chrome.storage.local.set({ [STORAGE_KEY]: records }, callback);
 }
 
+function updateActiveTabFloatingButtonVisibility(visible) {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    if (!tab?.id) return;
+
+    chrome.tabs.sendMessage(
+      tab.id,
+      {
+        type: 'SET_FLOATING_BUTTON_VISIBILITY',
+        visible,
+      },
+      () => {
+        chrome.runtime.lastError;
+      },
+    );
+  });
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message || !message.type) {
     return false;
@@ -80,6 +98,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     });
     return true;
+  }
+
+  if (message.type === 'OPEN_SIDE_PANEL') {
+    if (!sender.tab?.id || !chrome.sidePanel?.open) {
+      sendResponse({ ok: false, error: 'Side panel is not available.' });
+      return false;
+    }
+
+    try {
+      const openResult = chrome.sidePanel.open({ tabId: sender.tab.id });
+      if (openResult?.then) {
+        openResult.then(() => sendResponse({ ok: true })).catch((error) => {
+          sendResponse({ ok: false, error: error.message || String(error) });
+        });
+      } else {
+        sendResponse({ ok: true });
+      }
+    } catch (error) {
+      sendResponse({ ok: false, error: error.message || String(error) });
+      return false;
+    }
+    return true;
+  }
+
+  if (message.type === 'SIDE_PANEL_VISIBILITY') {
+    updateActiveTabFloatingButtonVisibility(Boolean(message.visible));
+    sendResponse({ ok: true });
+    return false;
   }
 
   if (message.type === 'DELETE_CONVERSATIONS') {

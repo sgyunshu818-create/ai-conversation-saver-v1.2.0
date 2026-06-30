@@ -49,6 +49,35 @@
     "https://www.minimax.io/*",
     "https://minimax.io/*"
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/assets/icons/chatai-memo-48.png"],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://gemini.google.com/*",
+        "https://chat.deepseek.com/*",
+        "https://www.deepseek.com/*",
+        "https://www.kimi.com/*",
+        "https://kimi.com/*",
+        "https://claude.ai/*",
+        "https://claude.com/*",
+        "https://www.doubao.com/*",
+        "https://doubao.com/*",
+        "https://chat.qwen.ai/*",
+        "https://qwen.ai/*",
+        "https://www.qwen.ai/*",
+        "https://www.qianwen.com/*",
+        "https://qianwen.com/*",
+        "https://yiyan.baidu.com/*",
+        "https://chatglm.cn/*",
+        "https://www.chatglm.cn/*",
+        "https://chat.minimax.io/*",
+        "https://www.minimax.io/*",
+        "https://minimax.io/*"
+      ]
+    }
+  ],
   "content_scripts": [
     {
       "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
